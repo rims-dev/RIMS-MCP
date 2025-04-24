@@ -1,15 +1,10 @@
 from mcp.server.fastmcp import FastMCP
-import dotenv
 import os
 import aiohttp
 import tempfile
-from pytesseract import image_to_string
 from PIL import Image
-import io
-from pdfminer.high_level import extract_text
-
-# .envファイルから環境変数を読み込む
-dotenv.load_dotenv()
+from typing import Union
+from pdfminer.high_level import extract_text  
 
 # APIのエンドポイント / 大会IDを.envファイルから取得
 API_ENDPOINT = os.getenv("API_ENDPOINT", "").strip()
@@ -133,13 +128,7 @@ async def get_rules():
                 return {"error": f"Failed to fetch rules. Status code: {response.status}"}
 
 
-import aiohttp
-import tempfile
-import os
-from typing import Union
-from pdfminer.high_level import extract_text  # または別のOCRライブラリ
-# WEB_PAGE_URL はグローバル定義済みと仮定
-
+# PDFのURLを受け取り、OCRを実行してテキストを返すツール
 async def pdf_ocr(url: str) -> Union[str, dict]:
     """
     PDFのURLを受け取り、OCRを実行してテキストを返すツール
