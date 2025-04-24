@@ -44,7 +44,7 @@ COMPETITION_ID=nNzAy
 }
 ```
 
-#### Claude Desktop (config.json)
+#### Claude Desktop (claude_desktop_config.json)
 
 ```json
 {
