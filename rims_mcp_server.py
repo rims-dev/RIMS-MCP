@@ -131,6 +131,113 @@ async def get_rules():
             else:
                 return {"error": f"Failed to fetch rules. Status code: {response.status}"}
 
+@mcp.tool()
+async def get_news_list():
+    """
+    ニュース一覧を取得するツール(/api/v2/web/competition/get_news.php?id={COMPETITION_ID})
+    """
+    url = f"{API_ENDPOINT}/api/v2/web/competition/get_news.php?id={COMPETITION_ID}"
+    headers = {"Referer": WEB_PAGE_URL}
+    async with aiohttp.ClientSession() as session:
+        async with session.get(url, headers=headers) as response:
+            if response.status == 200:
+                data = await response.json()
+                return {"news": data.get("news", [])}
+            else:
+                return {"error": f"Failed to fetch news. Status code: {response.status}"}
+
+@mcp.tool()
+async def get_news_article(article_id: str):
+    """
+    ニュース記事を取得するツール(/api/v2/web/competition/get_article.php?id={COMPETITION_ID}&article_id={article_id})
+    """
+    url = f"{API_ENDPOINT}/api/v2/web/competition/get_article.php?id={COMPETITION_ID}&article_id={article_id}"
+    headers = {"Referer": WEB_PAGE_URL}
+    async with aiohttp.ClientSession() as session:
+        async with session.get(url, headers=headers) as response:
+            if response.status == 200:
+                data = await response.json()
+                # PDF URLが存在する場合はOCRも実行
+                pdf_url = data.get("pdf_url")
+                ocr_text = None
+                if pdf_url:
+                    ocr_text = await pdf_ocr(pdf_url)
+                return {
+                    "news": {
+                        "title": data.get("article_title", data.get("title", "")),
+                        "content": data.get("article", data.get("content", "")),
+                        "date": data.get("date", ""),
+                        "image": data.get("image", ""),
+                        "pdf_url": pdf_url,
+                        "ocr_text": ocr_text
+                    }
+                }
+            else:
+                return {"error": f"Failed to fetch news article. Status code: {response.status}"}
+
+@mcp.tool()
+async def get_team_list():
+    """
+    チーム一覧を取得するツール(/api/v2/web/competition/get_team.php?id={COMPETITION_ID})
+    チーム状態(status)は以下の通り:
+        0: 状態非公開
+        1: エントリー済み
+        2: 書類審査通過
+        3: ビデオ審査通過
+        4: 大会出場
+        5: 出場辞退
+        6: 出場取り消し
+        7: 出場取りやめ
+        8: 書類審査落選
+        9: ビデオ審査落選
+        10: 審査中
+        11: エキシビジョン参加
+        12: 不明
+    """
+    TEAM_STATUS_MAP = {
+        0: "状態非公開",
+        1: "エントリー済み",
+        2: "書類審査通過",
+        3: "ビデオ審査通過",
+        4: "大会出場",
+        5: "出場辞退",
+        6: "出場取り消し",
+        7: "出場取りやめ",
+        8: "書類審査落選",
+        9: "ビデオ審査落選",
+        10: "審査中",
+        11: "エキシビジョン参加",
+        12: "不明"
+    }
+    url = f"{API_ENDPOINT}/api/v2/web/competition/get_teams.php?id={COMPETITION_ID}"
+    headers = {"Referer": WEB_PAGE_URL}
+    async with aiohttp.ClientSession() as session:
+        async with session.get(url, headers=headers) as response:
+            if response.status == 200:
+                data = await response.json()
+                teams = []
+                for team in data.get("teams", []):
+                    status_code = team.get("status")
+                    status_label = TEAM_STATUS_MAP.get(status_code, "不明")
+                    teams.append({
+                        "team_name": team.get("team_name", ""),
+                        "team_org": team.get("team_org", ""),
+                        "team_icon": team.get("team_icon"),
+                        "team_homepage": team.get("team_homepage"),
+                        "team_twitter": team.get("team_twitter"),
+                        "team_facebook": team.get("team_facebook"),
+                        "team_instagram": team.get("team_instagram"),
+                        "team_tiktok": team.get("team_tiktok"),
+                        "team_bluesky": team.get("team_bluesky"),
+                        "status_label": status_label,
+                        "data": team.get("data"),
+                        "match": team.get("match"),
+                    })
+                return {"teams": teams}
+            else:
+                return {"error": f"Failed to fetch team list. Status code: {response.status}"}
+
+
 
 # PDFのURLを受け取り、OCRを実行してテキストを返すツール
 async def pdf_ocr(url: str) -> Union[str, dict]:
