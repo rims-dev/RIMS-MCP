@@ -1,9 +1,5 @@
 # RIMS MCP
 
-以下の手順でDockerイメージをビルドしてコンテナを実行できます。
-
-`{your project directory}`を`docker-compose.yml`、`Dockerfile`、`.env`、`rims_mcp_server.py`があるディレクトリに置き換えてください。（`/Users/username/`などのフルパスを指定してください）
-
 ## example
 
 Q : ルールの概要を教えて
@@ -28,6 +24,9 @@ COMPETITION_ID=nNzAy
 
 #### VSCode Copilot (setting.json)
 
+`API_ENDPOINT`、`WEB_PAGE_URL`、`COMPETITION_ID`は大会ごとに異なりますので、適宜変更してください。
+なお、`WEB_PAGE_URL`は、末尾に`/`を追加してください。（例：`https://tourobo.net/`）
+
 ```json
 {
   "mcp": {
@@ -38,15 +37,18 @@ COMPETITION_ID=nNzAy
           "run",
           "-i",
           "--rm",
-          "-e", "API_ENDPOINT=https://rims.tourobo.net",
-          "-e", "WEB_PAGE_URL=https://tourobo.net/",
-          "-e", "COMPETITION_ID=nNzAy",
+          "-e", "API_ENDPOINT={{API_ENDPOINT}}",
+          "-e", "WEB_PAGE_URL={{WEB_PAGE_URL}}",
+          "-e", "COMPETITION_ID={{COMPETITION_ID}}",
           "xyzme01/rims-mcp"
         ],
         "alwaysAllow": [
           "get_faq",
           "get_rules",
-          "get_faq_keyword"
+          "get_faq_keyword",
+          "get_news_list",
+          "get_news_article",
+          "get_team_list"
         ]
       }
     }
@@ -55,6 +57,9 @@ COMPETITION_ID=nNzAy
 ```
 
 #### Claude Desktop (claude_desktop_config.json)
+
+`API_ENDPOINT`、`WEB_PAGE_URL`、`COMPETITION_ID`は大会ごとに異なりますので、適宜変更してください。
+なお、`WEB_PAGE_URL`は、末尾に`/`を追加してください。（例：`https://tourobo.net/`）
 
 ```json
 {
@@ -65,15 +70,18 @@ COMPETITION_ID=nNzAy
                 "run",
                 "-i",
                 "--rm",
-                "-e", "API_ENDPOINT=https://rims.tourobo.net",
-                "-e", "WEB_PAGE_URL=https://tourobo.net/",
-                "-e", "COMPETITION_ID=nNzAy",
+                "-e", "API_ENDPOINT={{API_ENDPOINT}}",
+                "-e", "WEB_PAGE_URL={{WEB_PAGE_URL}}",
+                "-e", "COMPETITION_ID={{COMPETITION_ID}}",
                 "xyzme01/rims-mcp"
             ],
             "alwaysAllow": [
                 "get_faq",
                 "get_rules",
-                "get_faq_keyword"
+                "get_faq_keyword",
+                "get_news_list",
+                "get_news_article",
+                "get_team_list"
             ]
         }
     }
