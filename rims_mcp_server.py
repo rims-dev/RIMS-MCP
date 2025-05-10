@@ -1,10 +1,14 @@
+# rims_mcp_server.py
 from mcp.server.fastmcp import FastMCP
 import os
 import aiohttp
 import tempfile
 from PIL import Image
 from typing import Union
-from pdfminer.high_level import extract_text  
+from pdfminer.high_level import extract_text
+
+from dotenv import load_dotenv
+load_dotenv(override=False, verbose=False)
 
 # APIのエンドポイント / 大会IDを.envファイルから取得
 API_ENDPOINT = os.getenv("API_ENDPOINT", "").strip()

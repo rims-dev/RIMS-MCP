@@ -30,17 +30,27 @@ COMPETITION_ID=nNzAy
 
 ```json
 {
-    "mcp": {
-        "servers": {
-            "rims-mcp": {
-                "command": "/bin/bash",
-                "args": [
-                    "-c",
-                    "cd {your project directory} && docker compose up -d && sleep 3 && docker exec -i rims-mcp python rims_mcp_server.py"
-                ]
-            }
-        }
-    },
+  "mcp": {
+    "servers": {
+      "rims-mcp": {
+        "command": "docker",
+        "args": [
+          "run",
+          "-i",
+          "--rm",
+          "-e", "API_ENDPOINT=https://rims.tourobo.net",
+          "-e", "WEB_PAGE_URL=https://tourobo.net/",
+          "-e", "COMPETITION_ID=nNzAy",
+          "xyzme01/rims-mcp"
+        ],
+        "alwaysAllow": [
+          "get_faq",
+          "get_rules",
+          "get_faq_keyword"
+        ]
+      }
+    }
+  }
 }
 ```
 
@@ -50,12 +60,41 @@ COMPETITION_ID=nNzAy
 {
     "mcpServers": {
         "rims-mcp": {
-            "command": "/bin/bash",
+            "command": "docker",
             "args": [
-                "-c",
-                "cd {your project directory} && docker compose up -d && sleep 3 && docker exec -i rims-mcp python rims_mcp_server.py"
+                "run",
+                "-i",
+                "--rm",
+                "-e", "API_ENDPOINT=https://rims.tourobo.net",
+                "-e", "WEB_PAGE_URL=https://tourobo.net/",
+                "-e", "COMPETITION_ID=nNzAy",
+                "xyzme01/rims-mcp"
+            ],
+            "alwaysAllow": [
+                "get_faq",
+                "get_rules",
+                "get_faq_keyword"
             ]
         }
     }
 }
+```
+
+## Dockerへのビルド方法
+
+```bash
+# Dockerイメージのビルド
+docker build -t xyzme01/rims-mcp:latest .
+
+# Docker Hubへのプッシュ
+docker push xyzme01/rims-mcp:latest
+```
+
+## ローカルでの実行方法
+
+```bash
+python3 -m venv .venv
+source .venv/bin/activate
+pip install -r requirements.txt
+python rims_mcp_client.py
 ```
